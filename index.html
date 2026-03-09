@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <title>Weather App</title>
+
+    <link rel="icon" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+</head>
+
+<body>
+
+    <div class="text-center mx-0 mx-md-5 mt-5">
+
+        <div class="card shadow weather-card">
+
+            <div class="card-body">
+
+                <h2 class="card-title">Local Weather</h2>
+                <i id="weatherIcon" class="bi bi-cloud icon"></i>
+                <h1 id="temperature" class="temp">--°F</h1>
+                <p id="condition">Loading conditions...</p>
+
+                <div class="row mt-3">
+
+                    <div class="col">
+                        <h6>Humidity</h6>
+                        <p id="humidity">--%</p>
+                    </div>
+                    <div class="col">
+                        <h6>Feels Like</h6>
+                        <p id="feelsLike">--°F</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <footer class="text-center mt-4">
+        <p>
+            Weather data provided by
+            <a href="https://open-meteo.com" target="_blank">Open-Meteo</a>
+        </p>
+    </footer>
+
+    <script>
+
+        const apiURL =
+        "https://api.open-meteo.com/v1/forecast?latitude=36.1682&longitude=85.5016&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago";
+
+        // Call the API
+        fetch(apiURL)
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            // Extract current weather data
+            const temp = data.current.temperature_2m;
+            const humidity = data.current.relative_humidity_2m;
+            const feelsLike = data.current.apparent_temperature;
+            const weatherCode = data.current.weather_code;
+
+            // Update the HTML with returned values
+            document.querySelector("#temperature").innerText = temp + "°F";
+            document.querySelector("#humidity").innerText = humidity + "%";
+            document.querySelector("#feelsLike").innerText = feelsLike + "°F";
+
+            let condition = "";
+            let icon = "";
+
+            if(weatherCode === 0){
+                condition = "Clear Sky";
+                icon = "bi bi-sun-fill";
+            }
+            else if(weatherCode <= 3){
+                condition = "Partly Cloudy";
+                icon = "bi bi-cloud-sun-fill";
+            }
+            else if(weatherCode <= 48){
+                condition = "Foggy";
+                icon = "bi bi-cloud-fog-fill";
+            }
+            else if(weatherCode <= 67){
+                condition = "Rain";
+                icon = "bi bi-cloud-rain-fill";
+            }
+            else if(weatherCode <= 77){
+                condition = "Snow";
+                icon = "bi bi-cloud-snow-fill";
+            }
+            else{
+                condition = "Stormy";
+                icon = "bi bi-cloud-lightning-rain-fill";
+            }
+
+            document.querySelector("#condition").innerText = condition;
+
+            document.querySelector("#weatherIcon").className = icon + " icon";
+
+        })
+
+        .catch(error => {
+
+            console.log("Weather API error:", error);
+
+            document.querySelector("#condition").innerText =
+            "Unable to load weather data.";
+
+        });
+
+    </script>
+
+</body>
+</html>
